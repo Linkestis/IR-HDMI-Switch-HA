@@ -1,0 +1,5 @@
+input_text:
+  hdmi_switch_last_input:
+    name: HDMI switch last requested input
+    max: 32
+    icon: mdi:source-branch

@@ -1,0 +1,71 @@
+script:
+  hdmi_switch_select:
+    alias: HDMI switch select
+    description: Send a learned discrete IR input command three times and return a response mapping.
+    fields:
+      source:
+        name: Source
+        description: fire_stick or media_player
+        required: true
+        selector:
+          select:
+            options:
+              - fire_stick
+              - media_player
+    sequence:
+      - variables:
+          requested_source: "{{ source | default('', true) | string | lower | trim }}"
+          target_button: >-
+            {%- if requested_source == 'fire_stick' -%}
+              button.hdmi_switch_input_1
+            {%- elif requested_source == 'media_player' -%}
+              button.hdmi_switch_input_2
+            {%- else -%}
+              invalid
+            {%- endif -%}
+      - if:
+          - condition: template
+            value_template: "{{ requested_source not in ['fire_stick', 'media_player'] }}"
+        then:
+          - variables:
+              invalid_result:
+                success: false
+                source: "{{ requested_source }}"
+                commands_sent: 0
+                reason: invalid_source
+          - stop: Invalid HDMI switch source.
+            response_variable: invalid_result
+      - if:
+          - condition: template
+            value_template: "{{ states(target_button) in ['unavailable', 'unknown'] }}"
+        then:
+          - variables:
+              unavailable_result:
+                success: false
+                source: "{{ requested_source }}"
+                commands_sent: 0
+                reason: button_unavailable
+          - stop: HDMI switch IR button is unavailable.
+            response_variable: unavailable_result
+      - repeat:
+          count: 3
+          sequence:
+            - action: button.press
+              target:
+                entity_id: "{{ target_button }}"
+            - delay:
+                milliseconds: 700
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.hdmi_switch_last_input
+        data:
+          value: "{{ requested_source }}"
+      - variables:
+          success_result:
+            success: true
+            source: "{{ requested_source }}"
+            commands_sent: 3
+            helper_state: "{{ states('input_text.hdmi_switch_last_input') }}"
+      - stop: HDMI switch IR commands sent.
+        response_variable: success_result
+    mode: restart

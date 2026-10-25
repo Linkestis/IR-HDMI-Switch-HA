@@ -1,0 +1,48 @@
+- id: example_hdmi_switch_for_capture
+  alias: Example - select capture input
+  description: Select the capture input and check the script response.
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.capture_mode
+      to: "on"
+  actions:
+    - action: script.hdmi_switch_select
+      data:
+        source: fire_stick
+      response_variable: switch_result
+    - if:
+        - condition: template
+          value_template: >-
+            {{ switch_result is not mapping
+               or not (switch_result.get('success', false) | bool)
+               or switch_result.get('source', '') != 'fire_stick'
+               or (switch_result.get('commands_sent', 0) | int(0)) != 3 }}
+      then:
+        - action: persistent_notification.create
+          data:
+            title: HDMI switch selection failed
+            message: The requested capture input was not confirmed by the IR script.
+    # An automatic switch can fall back while a sleeping source is waking up.
+    # Repeat the discrete selection after the source has had time to produce a signal.
+    - delay:
+        seconds: 10
+    - condition: state
+      entity_id: input_boolean.capture_mode
+      state: "on"
+    - action: script.hdmi_switch_select
+      data:
+        source: fire_stick
+      response_variable: repeat_switch_result
+    - if:
+        - condition: template
+          value_template: >-
+            {{ repeat_switch_result is not mapping
+               or not (repeat_switch_result.get('success', false) | bool)
+               or repeat_switch_result.get('source', '') != 'fire_stick'
+               or (repeat_switch_result.get('commands_sent', 0) | int(0)) != 3 }}
+      then:
+        - action: persistent_notification.create
+          data:
+            title: HDMI switch repeat selection not confirmed
+            message: The delayed repeat selection was not confirmed by the IR script.
+  mode: single
