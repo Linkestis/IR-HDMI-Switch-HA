@@ -18,6 +18,19 @@ The switch is treated as a group of discrete input buttons. Home Assistant sends
 - Home Assistant with MQTT configured.
 - Optional USB capture device and HyperHDR/Ambilight computer.
 
+### About the eRemote HA
+
+The LinknLink eRemote HA is an IR-to-MQTT hub for Home Assistant. It learns or selects IR commands for conventional appliances and exposes the resulting controls through MQTT. The product listing describes support for televisions, set-top boxes, amplifiers, projectors, and air conditioners, with Alexa and Google Home compatibility.
+
+For this project, the most relevant details are:
+
+- 2.4 GHz Wi-Fi is required for the eRemote HA; 5 GHz Wi-Fi is not supported by the device.
+- The hub has a 360-degree IR blaster and a stated range of up to 12 m, subject to room layout and IR receiver placement.
+- Missing commands can be learned from the original remote, which is useful when a switch exposes separate input buttons.
+- The product listing states support for up to 50 devices and 25 buttons; the exact controls available depend on the selected app device template.
+
+These product capabilities and limits are based on the [LinknLink eRemote HA product listing](https://www.amazon.co.uk/stores/LinknLinkSmartHome/page/D9721263-2F0B-4F85-89EF-A0A6A5660DB7).
+
 ## Tested with
 
 - FeinTech VSW03102 3x1 HDMI switch with automatic switching.
