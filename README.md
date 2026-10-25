@@ -143,3 +143,9 @@ An automation selects the capture input before enabling or using the capture pip
 ## License
 
 MIT. See `LICENSE`.
+
+## Support
+
+[Support this work on Revolut](https://revolut.me/mariannud)
+
+Contributed by MA-Linkestis (2026).
